@@ -1,14 +1,27 @@
-PROC IMPORT DATAFILE='/home/u63313755/statystyka_w_sas/projekt_dodatkowy/WA_Fn-UseC_-HR-Employee-Attrition.xlsx'
+PROC IMPORT REPLACE DATAFILE='/home/u63313755/statystyka_w_sas/projekt_dodatkowy/WA_Fn-UseC_-HR-Employee-Attrition.xlsx'
 	DBMS=XLSX
 	OUT=WORK.IMPORT;
 	GETNAMES=YES;
 RUN;
 
-PROC CONTENTS DATA=WORK.IMPORT; RUN;
+proc sort data=WORK.IMPORT;
+	BY attrition;
+run;
+
+
+proc surveyselect data=WORK.IMPORT out=splitdata samprate=0.7 outall;
+    strata attrition;
+run;
+
+data training validation;
+    set splitdata;
+    if selected then output training;
+    else output validation;
+run;
 
 /* Method 1 */
 
-proc logistic data=WORK.IMPORT;
+proc logistic data=training;
     class 
     	BusinessTravel
     	Department
@@ -45,7 +58,7 @@ proc logistic data=WORK.IMPORT;
     	;
 run;
 
-proc logistic data=WORK.IMPORT;
+proc logistic data=training;
     class 
     	BusinessTravel
     	Department
@@ -81,7 +94,7 @@ proc logistic data=WORK.IMPORT;
     	;
 run;
 
-proc logistic data=WORK.IMPORT;
+proc logistic data=training;
     class 
     	BusinessTravel
     	Department
@@ -116,7 +129,7 @@ proc logistic data=WORK.IMPORT;
     	;
 run;
 
-proc logistic data=WORK.IMPORT;
+proc logistic data=training;
     class 
     	BusinessTravel
     	Department
@@ -150,7 +163,7 @@ proc logistic data=WORK.IMPORT;
     	;
 run;
 
-proc logistic data=WORK.IMPORT;
+proc logistic data=training;
     class 
     	BusinessTravel
     	Department
@@ -183,7 +196,7 @@ proc logistic data=WORK.IMPORT;
     	;
 run;
 
-proc logistic data=WORK.IMPORT;
+proc logistic data=training;
     class 
     	BusinessTravel
     	Department
@@ -215,7 +228,7 @@ proc logistic data=WORK.IMPORT;
     	;
 run;
 
-proc logistic data=WORK.IMPORT;
+proc logistic data=training;
     class 
     	BusinessTravel
     	Department
@@ -246,7 +259,7 @@ proc logistic data=WORK.IMPORT;
     	;
 run;
 
-proc logistic data=WORK.IMPORT;
+proc logistic data=training;
     class 
     	BusinessTravel
     	Department
@@ -276,7 +289,7 @@ proc logistic data=WORK.IMPORT;
     	;
 run;
 
-proc logistic data=WORK.IMPORT;
+proc logistic data=training;
     class 
     	BusinessTravel
     	Department
@@ -304,7 +317,7 @@ proc logistic data=WORK.IMPORT;
     	;
 run;
 
-proc logistic data=WORK.IMPORT;
+proc logistic data=training;
     class 
     	BusinessTravel
     	Department
@@ -331,7 +344,7 @@ proc logistic data=WORK.IMPORT;
     	;
 run;
 
-proc logistic data=WORK.IMPORT;
+proc logistic data=training outmodel=method1;
     class 
     	BusinessTravel
     	Department
@@ -356,10 +369,11 @@ proc logistic data=WORK.IMPORT;
     	YearsSinceLastPromotion
     	;
 run;
+
 
 /* Method 2 */
 
-proc logistic data=WORK.IMPORT;
+proc logistic data=training outmodel=method2_1;
     class 
     	BusinessTravel
     	Gender
@@ -375,7 +389,7 @@ proc logistic data=WORK.IMPORT;
     	;
 run;
 
-proc logistic data=WORK.IMPORT;
+proc logistic data=training outmodel=method2_2;
     class 
     	OverTime
     	;
@@ -386,7 +400,7 @@ proc logistic data=WORK.IMPORT;
     	;
 run;
 
-proc logistic data=WORK.IMPORT;
+proc logistic data=training outmodel=method2_3;
     class 
     	OverTime
     	;
@@ -397,3 +411,74 @@ proc logistic data=WORK.IMPORT;
     	;
 run;
 
+proc logistic inmodel=method1;
+    score data=validation out=predicted_validity;
+run;
+
+data missmatches;
+	set predicted_validity;
+	if (P_Yes > P_No and Attrition = 'Yes') then
+		mismatch = 'No';
+	else if (P_No > P_Yes and Attrition = 'No') then
+		mismatch = 'No';
+	else
+		mismatch = 'Yes';
+run;
+
+proc summary data=missmatches nway print;
+	class mismatch;
+run;
+
+proc logistic inmodel=method2_1;
+    score data=validation out=predicted_validity;
+run;
+
+data missmatches;
+	set predicted_validity;
+	if (P_Yes > P_No and Attrition = 'Yes') then
+		mismatch = 'No';
+	else if (P_No > P_Yes and Attrition = 'No') then
+		mismatch = 'No';
+	else
+		mismatch = 'Yes';
+run;
+
+proc summary data=missmatches nway print;
+	class mismatch;
+run;
+
+proc logistic inmodel=method2_2;
+    score data=validation out=predicted_validity;
+run;
+
+data missmatches;
+	set predicted_validity;
+	if (P_Yes > P_No and Attrition = 'Yes') then
+		mismatch = 'No';
+	else if (P_No > P_Yes and Attrition = 'No') then
+		mismatch = 'No';
+	else
+		mismatch = 'Yes';
+run;
+
+proc summary data=missmatches nway print;
+	class mismatch;
+run;
+
+proc logistic inmodel=method2_3;
+    score data=validation out=predicted_validity;
+run;
+
+data missmatches;
+	set predicted_validity;
+	if (P_Yes > P_No and Attrition = 'Yes') then
+		mismatch = 'No';
+	else if (P_No > P_Yes and Attrition = 'No') then
+		mismatch = 'No';
+	else
+		mismatch = 'Yes';
+run;
+
+proc summary data=missmatches nway print;
+	class mismatch;
+run;

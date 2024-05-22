@@ -21,9 +21,9 @@ by one (starting with the one with biggest p-value), until a model with only sta
 significant predictors is left.
 2. try following combinations of predictors:
     - Age, BusinessTravel, Gender, DistanceFromHome, JobSatisfaction, MonthlyIncome, OverTime (stereotypically, these factors are most crucial for employees)
-    - MonthlyIncome, NumCompaniesWorked, StockOptionLevel, Gender (these factors should be most crucial from 'homo economicus' viewpoint)
+    - MonthlyIncome, OverTime, StockOptionLevel, DistanceFromHome (these factors should be most crucial from 'homo economicus' viewpoint)
     - Age, PerformanceRating, OverTime, JobInvolvement (stereotypical factors taken into consideration when firing someone)
 
-We then compare the resulting models using their AIC value and chose the one with lower value
-as proper.
-
+To compare the models, we are going to use only 70% of our data-set for traning, and use the other 30%
+for validation. The model that will generate fewer incorrect predictions when applied to the training
+set will be chosen as the correct one.
