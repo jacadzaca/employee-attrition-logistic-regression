@@ -356,3 +356,44 @@ proc logistic data=WORK.IMPORT;
     	YearsSinceLastPromotion
     	;
 run;
+
+/* Method 2 */
+
+proc logistic data=WORK.IMPORT;
+    class 
+    	BusinessTravel
+    	Gender
+    	JobRole
+    	MaritalStatus
+    	OverTime
+    	;
+    model attrition(event='Yes') = 
+    	Age
+    	DistanceFromHome
+    	JobSatisfaction
+    	MonthlyIncome
+    	;
+run;
+
+proc logistic data=WORK.IMPORT;
+    class 
+    	OverTime
+    	;
+    model attrition(event='Yes') = 
+    	DistanceFromHome
+    	StockOptionLevel
+    	MonthlyIncome
+    	;
+run;
+
+proc logistic data=WORK.IMPORT;
+    class 
+    	OverTime
+    	;
+    model attrition(event='Yes') = 
+    	Age
+    	PerformanceRating
+		JobInvolvement 
+    	;
+run;
+
