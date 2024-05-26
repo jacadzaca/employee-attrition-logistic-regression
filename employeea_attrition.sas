@@ -19,6 +19,31 @@ data training validation;
     else output validation;
 run;
 
+proc logistic data=training outmodel=method1;
+    class 
+    	BusinessTravel
+    	Department
+    	EducationField
+    	Gender
+    	JobRole
+    	MaritalStatus
+    	OverTime
+    	;
+    model attrition(event='Yes') = 
+    	Age
+    	DistanceFromHome
+    	EnvironmentSatisfaction
+    	JobInvolvement
+    	JobLevel
+    	JobSatisfaction
+    	NumCompaniesWorked
+    	StockOptionLevel
+    	YearsInCurrentRole
+    	YearsSinceLastPromotion
+    	YearsSinceLastPromotion
+    	;
+run;
+
 /* Method 1 */
 
 proc logistic data=training;
